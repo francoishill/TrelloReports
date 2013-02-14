@@ -33,7 +33,10 @@
 							CornerRadius='5'
 							Padding='5'
 							Margin='0 0 0 10'>
-						<TextBlock Text='{Binding BoardName}' />
+						<StackPanel Orientation='Horizontal'>
+							<TextBlock Text='{Binding BoardName}' />
+							<TextBlock Text='{Binding BoardID, StringFormat=" (\{0\})"}' />
+						</StackPanel>
 					</Border>
 					<HierarchicalDataTemplate.ItemTemplate>
 						<DataTemplate>
@@ -44,6 +47,7 @@
 									Margin='0 0 0 3'>
 								<StackPanel Orientation='Vertical'>
 									<TextBlock Text='{Binding CardupdateDateString, StringFormat="yyyy-MM-dd HH\\hmm:ss"}' />
+									<TextBlock Text='{Binding UpdateType}' />
 									<CheckBox IsChecked='{Binding CardClosed, Mode=OneWay}' Content='Closed' />
 									<TextBlock Text='{Binding CardName, StringFormat="Card name: \{0\}"}'/>
 									<TextBlock Text='{Binding CardDescription, StringFormat="Card desc: \{0\}"}' />
