@@ -25,6 +25,7 @@ namespace TrelloReports
 		//These two (Key&Token) are for a specific user, allow user to enter these as Settings
 		private const string cAuthKey = "44f745f18b33a5d556a8af895bcb8923";
 		private const string cUserToken = "e4e7545f2b2184b81c8d2b5489da955d8976a69e954da4619d13618a87798e06";
+		private const string wadisoBoardID = "50fd4e14c953c6797e00526f";
 
 		ObservableCollection<TrelloBoard> listOfBoards = new ObservableCollection<TrelloBoard>();
 
@@ -37,23 +38,49 @@ namespace TrelloReports
 
 		private void Window_Loaded_1(object sender, RoutedEventArgs e)
 		{
-			var chelloClient = new ChelloClient(cAuthKey, cUserToken);
+			To use the code below add reference to Trello.NET, see "...\Handy downloads\...\TrelloNetTrelloAPI"
+
+			var trello = new TrelloNet.Trello(cAuthKey);
+			trello.Authorize(cUserToken);
+
+			var wadisoBoard = trello.Boards.WithId(wadisoBoardID);
+
+			var paging = new TrelloNet.Paging(1000, 0);//Page 0, can go up to 100
+			var actions = trello.Actions.ForBoard(
+				wadisoBoard,
+				new List<TrelloNet.ActionType>()
+				{ 
+					TrelloNet.ActionType.CommentCard,
+					TrelloNet.ActionType.CreateList 
+				},
+				null,
+				paging);
+			//Console.WriteLine("Action count = {0}", actions.Count());
+			foreach (var act in actions)
+			{
+				string datestr = act.Date.ToString(@"yyyy-MM-dd HH\hmm:ss");
+				if (act is TrelloNet.CommentCardAction)
+					Console.WriteLine("[{0}] Comment: {1}", datestr, (act as TrelloNet.CommentCardAction).Data.Text);
+				else
+					Console.WriteLine("[{0}] UNKNOWN action type '{1}'", datestr, act.GetType().Name);
+			}
+			
+			/*var chelloClient = new ChelloClient(cAuthKey, cUserToken);
 
 			//var boards = chello.Members.PinnedBoards("francoishill");
-			/*var boards = chelloClient.Boards.ForUser("francoishill");
-			foreach (var b in boards)
-				listOfBoards.Add(new TrelloBoard(chelloClient, b));*/
+			//var boards = chelloClient.Boards.ForUser("francoishill");
+			//foreach (var b in boards)
+			//	listOfBoards.Add(new TrelloBoard(chelloClient, b));
 
-			var wadisoBoardID = "50fd4e14c953c6797e00526f";
 			var wadisoBoard = chelloClient.Boards.Single(wadisoBoardID);
-			/*var cardUpdateTypes = chelloClient.CardUpdates.ForBoard(wadisoBoardID, new TempTrelloCardupdatesArguments(1000))
-				.GroupBy(c => c.Type)
-				.Select(kv => kv.Key)
-				.OrderBy(s => s);
-			foreach (var cu in cardUpdateTypes)
-				Console.WriteLine(cu);*/
+			//var cardUpdateTypes = chelloClient.CardUpdates.ForBoard(wadisoBoardID, new TempTrelloCardupdatesArguments(1000))
+			//	.GroupBy(c => c.Type)
+			//	.Select(kv => kv.Key)
+			//	.OrderBy(s => s);
+			//foreach (var cu in cardUpdateTypes)
+			//	Console.WriteLine(cu);
 
-			listOfBoards.Add(new TrelloBoard(chelloClient, wadisoBoard));
+			listOfBoards.Add(new TrelloBoard(chelloClient, wadisoBoard));*/
 		}
 	}
 
